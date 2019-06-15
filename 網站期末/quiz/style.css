@@ -1,0 +1,10 @@
+body{
+    text-align : center;
+}
+h5{
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 2em;
+    color: #323338;
+}
