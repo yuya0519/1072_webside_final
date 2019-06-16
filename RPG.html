@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <title>RPG Game</title>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Let's play volleyball</title>
+     <link rel="stylesheet" href="RPG/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    </script>
+     <script src="js/skel.min.js"></script>
+		<script src="js/init.js"></script>
+		<noscript>
+            <link rel="stylesheet" href="css/skel-noscript.css" />
+			<link rel="stylesheet" href="css/style.css" />
+		</noscript>
+    <body>
+		<div id="wrapper">	
+            <div id="header">
+				<div class="container"> 					
+					<!-- Logo -->
+					<div id="logo">
+						<h1><a>接球球</a></h1>
+						<span>GoGo</span>
+					</div>
+					
+					<!-- Nav -->
+					<nav id="nav">
+						<ul class="style2">
+							<li ><a href="index.html">主頁</a></li>
+                            <li><a href="aboutme.html">關於我</a></li>
+                            <li><a href="schedule.html" >行程表</a></li>
+							<li><a href="quiz.html">趣味小測驗</a></li>
+							<li><a href="random.html">隨機講解</a></li>
+                            <li class="active"><a href="RPG.html" >RPG小遊戲</a></li>
+							<li><a href="vedio.html" >影片</a></li>
+						</ul>
+					</nav>       
+                            <style>
+                             * { padding: 0; margin: 0; }
+                            canvas { background: white; display: block; margin: 0 auto; }
+                            </style>
+
+				    </div>
+			</div>
+			<!-- Copyright -->
+		</div>
+<body>
+<img id="volleyball"src="images/volleyball.png" style="display:none"/>
+    <img id="nini" src="images/nini.PNG" style="display:none"/>
+<canvas id="myCanvas" width="480" height="360"></canvas>
+
+<script>
+ var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var ballRadius = 10;
+    var canvaswidth=canvas.width;
+    var canvasheight=(canvas.height-35);
+    var x = canvaswidth/2;
+    var y = canvasheight-30;
+    var dx = 2;
+    var dy = -2;
+    var paddleHeight = 10;
+    var paddleWidth = 75;
+    var paddleX = (canvaswidth-paddleWidth)/2;
+    var rightPressed = false;
+    var leftPressed = false;
+    var brickRowCount = 4;
+    var brickColumnCount = 3;
+    var brickWidth = 95;
+    var brickHeight = 20;
+    var brickPadding = 10;
+    var brickOffsetTop = 30;
+    var brickOffsetLeft = 30;
+    var score = 0;
+    var lives = 2;
+    var bricks = [];
+for(var c=0; c<brickColumnCount; c++) {
+  bricks[c] = [];
+  for(var r=0; r<brickRowCount; r++) {
+    bricks[c][r] = { x: 0, y: 0, status: 1 };
+  }
+}
+
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
+
+function keyDownHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = true;
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = true;
+    }
+}
+
+function keyUpHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = false;
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = false;
+    }
+}
+
+function mouseMoveHandler(e) {
+  var relativeX = e.clientX - canvas.offsetLeft;
+  if(relativeX > 0 && relativeX < canvaswidth) {
+    paddleX = (relativeX - paddleWidth/2)-30;
+  }
+}
+function collisionDetection() {
+  for(var c=0; c<brickColumnCount; c++) {
+    for(var r=0; r<brickRowCount; r++) {
+      var b = bricks[c][r];
+      if(b.status == 1) {
+        if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+          dy = -dy;
+          b.status = 0;
+          score++;
+          if(score == brickRowCount*brickColumnCount) {
+            alert("YOU WIN, CONGRATS!");
+            document.location.reload();
+          }
+        }
+      }
+    }
+  }
+}
+
+function drawBall() {
+  ctx.beginPath();
+  var img=document.getElementById("volleyball");
+  ctx.drawImage(img,x,y,30,30);
+  ctx.closePath();
+}
+function drawPaddle() {
+  ctx.beginPath();
+  var img=document.getElementById("nini");
+  ctx.drawImage(img,paddleX+30,canvasheight-paddleHeight+5,40,40);
+  ctx.closePath();
+}
+function drawBricks() {
+  for(var c=0; c<brickColumnCount; c++) {
+    for(var r=0; r<brickRowCount; r++) {
+      if(bricks[c][r].status == 1) {
+        var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+        var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.beginPath();
+        var my_gradient = ctx.createLinearGradient(0, 0, 0, 170);
+        my_gradient.addColorStop(0, "#FFFFFF");
+        my_gradient.addColorStop(1, "#0000AA");
+        ctx.fillStyle = my_gradient;
+        ctx.fillRect(brickX, brickY, brickWidth, brickHeight);
+       /* ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.addColorStop(0, "red");
+        ctx.addColorStop(1, "blue");
+        ctx.fillStyle ;
+        ctx.fill();*/
+        ctx.closePath();
+      }
+    }
+  }
+}
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Score: "+score, 8, 20);
+}
+function drawLives() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Lives: "+lives, canvaswidth-65, 20);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBricks();
+  drawBall();
+  drawPaddle();
+  drawScore();
+  drawLives();
+  collisionDetection();
+
+  if(x + dx > canvaswidth-ballRadius || x + dx < ballRadius) {
+    dx = -dx;
+  }
+  if(y + dy < ballRadius) {
+    dy = -dy;
+  }
+  else if(y + dy > canvasheight-ballRadius) {
+    if(x > paddleX && x < paddleX + paddleWidth) {
+      dy = -dy;
+    }
+    else {
+      lives--;
+      if(!lives) {
+        alert("GAME OVER");
+        document.location.reload();
+      }
+      else {
+        x = canvaswidth/2;
+        y = canvasheight-30;
+        dx = 3;
+        dy = -3;
+        paddleX = (canvaswidth-paddleWidth)/2;
+      }
+    }
+  }
+
+  if(rightPressed && paddleX < canvaswidth-paddleWidth) {
+    paddleX += 7;
+  }
+  else if(leftPressed && paddleX > 0) {
+    paddleX -= 7;
+  }
+
+  x += dx;
+  y += dy;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+    <p></p>
+</body>
+</html>
